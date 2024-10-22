@@ -1,10 +1,38 @@
-"use client"; // Ensure this is a client component
-import React, { useState } from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
+import bg from '../public/background.jpg'
+import { useAuth } from '@/context/AuthContext';
+import Loading from './Loading';
+import AddNewspaper from './AddNewspaper';
+import Login from './Login';
 
 export default function Dashboard() {
     const [selectedPaper, setSelectedPaper] = useState("The Economic Times");
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
     const [selectedCategory, setSelectedCategory] = useState("All Categories");
+    // State to manage the selected article and view mode
+    const [selectedArticleId, setSelectedArticleId] = useState(null);
+    const [viewMode, setViewMode] = useState('highlights'); // 'highlights', 'summary', or 'full'
+
+    const { currentUser, loading } = useAuth()
+
+
+    const isAdmin = false;
+
+
+    if (loading) {
+
+        return <Loading />
+
+    }
+
+    if (currentUser) {
+        if (isAdmin) {
+            return <AddNewspaper />
+        }
+    } else {
+        return <Login />
+    }
 
     // Sample article data with categories
     const articles = [
@@ -417,9 +445,7 @@ export default function Dashboard() {
         ? articles
         : categorizedArticles[selectedCategory] || [];
 
-    // State to manage the selected article and view mode
-    const [selectedArticleId, setSelectedArticleId] = useState(null);
-    const [viewMode, setViewMode] = useState('highlights'); // 'highlights', 'summary', or 'full'
+
 
     // Function to handle button click
     const handleView = (articleId, mode) => {
@@ -429,7 +455,7 @@ export default function Dashboard() {
     const readAloud = (text) => {
         const speech = window.speechSynthesis;
         const utterance = new SpeechSynthesisUtterance(text);
-        
+
         // Optionally set voice, pitch, and rate
         utterance.pitch = 0.2; // Range: 0 to 2
         utterance.rate = 1.3; // Range: 0.1 to 10
@@ -488,13 +514,13 @@ export default function Dashboard() {
             {/* Category Selection using Buttons */}
             <div className="mb-6">
                 <label className="block text-lg font-medium mb-2">Choose a Category:</label>
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 flex-wrap gap-2">
                     <button
                         className={`border border-gray-300 p-2 rounded-md ${selectedCategory === "All Categories" ? 'bg-gray-300' : 'hover:bg-gray-100'}`}
                         onClick={() => setSelectedCategory("All Categories")}
                     >
                         All Categories
-                    </button>
+                    </button >
                     {Object.keys(categorizedArticles).map((category) => (
                         <button
                             key={category}
@@ -508,13 +534,13 @@ export default function Dashboard() {
             </div>
 
             {/* Display Selected Newspaper */}
-            <div className="bg-white shadow-lg rounded-lg p-4 mb-6">
-                <h2 className="text-xl font-bold mb-4">Newspaper : {selectedPaper}</h2>
+            <div className="bg-white shadow-lg rounded-lg p-4 mb-6 " >
+                <h2 className="text-xl font-bold mb-4 ">Newspaper : {selectedPaper}</h2>
 
                 {/* Articles */}
                 <div className="space-y-4">
                     {filteredArticles.map((article) => (
-                        <div key={article.id} className="bg-gray-50 p-4 rounded-lg shadow">
+                        <div key={article.id} className="bg-gray-50 p-4 rounded-lg shadow"  >
                             <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
                             <div className="flex space-x-4 mb-4">
                                 <button
@@ -541,15 +567,15 @@ export default function Dashboard() {
                             {selectedArticleId === article.id && (
                                 <div className="mt-4">
                                     <div className='flex flex-row gap-3'><h5 className="text-lg font-semibold">{(viewMode == "full") ? "Full Article" : (viewMode == "summary") ? "AI Summary" : "Key Highlights"}</h5>
-                                        <button 
-                                        onClick={() => {
-                                            const textToRead = viewMode === 'full'
-                                                ? article.content
-                                                : viewMode === 'summary'
-                                                    ? article.summary
-                                                    : article.highlights.join(', '); // Use join to create a single string
-                                            readAloud(textToRead); // Read the selected text aloud
-                                        }} className="text-blue-500 hover:text-blue-700">
+                                        <button
+                                            onClick={() => {
+                                                const textToRead = viewMode === 'full'
+                                                    ? article.content
+                                                    : viewMode === 'summary'
+                                                        ? article.summary
+                                                        : article.highlights.join(', '); // Use join to create a single string
+                                                readAloud(textToRead); // Read the selected text aloud
+                                            }} className="text-blue-500 hover:text-blue-700">
                                             📢
                                         </button>
                                     </div>

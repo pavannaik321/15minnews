@@ -1,6 +1,7 @@
 import React from 'react'
 import { Fugaz_One } from "next/font/google";
 import Button from './Button';
+import Link from 'next/link';
 const fugaz = Fugaz_One({subsets:["latin"],weight:['400']});
 export default function Hero() {
 
@@ -13,8 +14,12 @@ export default function Hero() {
       Get the highlights from top newspapers in minutes and <span className='font-semibold '>personalize your daily news experience. </span>
       </p>
       <div className='grid grid-cols-2 gap-4 w-fit mx-auto '>
+        <Link href={'/dashboard'}>
         <Button text="Sign up" />
+        </Link>
+        <Link href={'/dashboard'}>
         <Button text="Login" dark/>
+        </Link>
       </div>
     </div>
   )

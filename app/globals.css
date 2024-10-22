@@ -7,3 +7,9 @@
   -webkit-background-clip: text;
   
 }
+.backgroundImage {
+  background-image: "url('./background.jpg')";
+  background-size : 'cover';
+  background-position: 'center';
+  background-repeat : 'no-repeat';
+}
